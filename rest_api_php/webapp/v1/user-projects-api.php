@@ -25,7 +25,17 @@ use Firebase\JWT\Key;
 
         $header = getallheaders();
 
-        $jwt = $header['Authorization'];
+        if(empty($header['Authorization'])){
+            http_response_code(500);
+            echo json_encode(array(
+                "status" => 0,
+                "message" => "Access denied."
+            ));
+            return;
+        } else {
+            $jwt = $header['Authorization'];
+        }
+
 
         try{
 
