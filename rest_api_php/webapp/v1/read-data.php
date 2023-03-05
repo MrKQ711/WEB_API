@@ -27,10 +27,20 @@ use Firebase\JWT\Key;
 
         if(!empty($data->jwt)){
 
-            //$data = json_decode(file_get_contents("php://input"));
-            $all_headers = getallheaders();
+            $header = getallheaders();
 
-            $data->jwt = $all_headers['Authorization'];
+            //$data = json_decode(file_get_contents("php://input"));
+            if(empty($header['Authorization'])){
+                http_response_code(500);
+                echo json_encode(array(
+                    "status" => 0,
+                    "message" => "Access denied."
+                ));
+                return;
+            } else {
+                $data->jwt = $header['Authorization'];
+            }
+            
 
             if(!empty($data->jwt)){
 
