@@ -1,11 +1,14 @@
 <?php
 
+
     class Users{
         
         // declare variables
         public $name;
         public $email;
         public $password;
+
+        public $id;
 
         public $user_id;
         public $project_name;
@@ -15,6 +18,8 @@
         private $conn;
         private $users_tbl;
         private $projects_tbl;
+
+
 
         public function __construct($db){
             $this->conn = $db;
@@ -92,6 +97,9 @@
 
         // to get all projects
         public function get_all_projects(){
+
+            
+
             $project_query = "SELECT * FROM " . $this->projects_tbl . " ORDER BY id DESC";
             
             $project_obj = $this->conn->prepare($project_query);
@@ -112,6 +120,82 @@
             $project_obj->execute();
 
             return $project_obj->get_result();
+        }
+
+        // CRUD operations
+
+        public function get_all_data(){
+
+            $sql_query = "SELECT * FROM " . $this->users_tbl; 
+
+            $std_obj = $this->conn->prepare($sql_query);
+
+            // execute the query
+            $std_obj->execute();
+
+            return $std_obj->get_result();
+        }
+
+
+        public function get_single_user(){
+
+            $sql_query = "SELECT * FROM " . $this->users_tbl . " WHERE id = ?";
+
+            $obj = $this->conn->prepare($sql_query);
+
+            $obj->bind_param("i", $this->id);
+
+            $obj->execute();
+
+            $data = $obj->get_result();
+            return $data->fetch_assoc();
+        }
+
+        // update data
+        public function update_user(){
+
+            // query to update data
+            $sql_query = "UPDATE " . $this->users_tbl . " SET name = ?, email = ?, password = ? WHERE id = ?";
+
+            // prepare the query
+            $query_object = $this->conn->prepare($sql_query);
+
+            // sanitize the input
+            $this->name = htmlspecialchars(strip_tags($this->name));
+            $this->email = htmlspecialchars(strip_tags($this->email));
+            $this->password = htmlspecialchars(strip_tags($this->password));
+            $this->id = htmlspecialchars(strip_tags($this->id));
+
+            // bind the parameters
+            $query_object->bind_param("sssi", $this->name, $this->email, $this->password, $this->id);
+
+            if ($query_object->execute()) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        // delete data
+        public function delete_user(){
+                
+                // query to delete data
+                $sql_query = "DELETE FROM " . $this->users_tbl . " WHERE id = ?";
+    
+                // prepare the query
+                $query_object = $this->conn->prepare($sql_query);
+    
+                // sanitize the input
+                $this->id = htmlspecialchars(strip_tags($this->id));
+    
+                // bind the parameters
+                $query_object->bind_param("i", $this->id);
+    
+                if ($query_object->execute()) {
+                    return true;
+                } else {
+                    return false;
+                }
         }
     }
 
