@@ -28,11 +28,21 @@ use Firebase\JWT\Key;
 
         $header = getallheaders();
 
+        if(empty($header['Authorization'])){
+            http_response_code(500);
+            echo json_encode(array(
+                "status" => 0,
+                "message" => "Access denied."
+            ));
+            return;
+        } else {
+            $jwt = $header['Authorization'];
+        }
+
         if(!empty($data->name) && !empty($data->description) && !empty($data->status)){
             
             try{
 
-                $jwt = $header["Authorization"];
 
                 $secret_key = "owt125";
 
